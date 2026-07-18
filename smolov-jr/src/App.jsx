@@ -59,6 +59,8 @@ export default function App() {
               cursor: 'pointer',
               transition: 'all 0.15s',
               WebkitTapHighlightColor: 'transparent',
+              outline: 'none',
+
             }}
           >
             {label}
