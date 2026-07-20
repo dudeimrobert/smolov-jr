@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 
 // ---------------------------------------------------------------------------
-// PROGRESS LOG (v2 - auto-import)
+// PROGRESS LOG
 // Tracks working numbers over time for the main lifts.
-// Manual entries are stored in the `progress_data` table.
-// Auto entries are derived at load time from training_data.history.
+// Same single-row-per-user JSONB sync pattern as the other trackers,
+// stored in the `progress_data` table.
 // ---------------------------------------------------------------------------
 
 const FONT_MONO = "'DM Mono', monospace"
@@ -35,15 +35,17 @@ const CUSTOM_ACCENTS = ['#B08CC9', '#C97FA8', '#7FC9B8', '#C9C27F']
 const AUTO_LIFT_MAP = {
   backsquat: 'squat',
   bench: 'bench',
+  deadlift: 'deadlift',
   ohp: 'ohp',
 }
 
-// training_data.history stores weight but not reps.
-// Adjust these to match the working rep scheme in program.js.
+// Fallback reps for history entries logged before the tracker stored reps.
+// New entries carry their own reps (main lifts 5, ohp accessory 10-15 -> 10).
 const AUTO_REPS = {
   backsquat: 5,
   bench: 5,
-  ohp: 5,
+  deadlift: 5,
+  ohp: 10,
 }
 
 const emptyState = () => ({
@@ -439,13 +441,17 @@ function buildAutoEntries(history) {
       if (!item?.date || !item?.weight) continue
       const w = parseFloat(item.weight)
       if (!w) continue
-      if (!byDate[item.date] || w > byDate[item.date]) byDate[item.date] = w
+      const r = parseInt(item.reps, 10) || AUTO_REPS[ex] || 5
+      const cand = { weight: w, reps: r }
+      if (!byDate[item.date] || e1rm(w, r) > e1rm(byDate[item.date].weight, byDate[item.date].reps)) {
+        byDate[item.date] = cand
+      }
     }
-    const entries = Object.entries(byDate).map(([date, weight]) => ({
+    const entries = Object.entries(byDate).map(([date, { weight, reps }]) => ({
       id: `auto-${ex}-${date}-${weight}`,
       date,
       weight,
-      reps: AUTO_REPS[ex] || 5,
+      reps,
       note: '',
       auto: true,
     }))
@@ -482,3 +488,4 @@ function Sparkline({ data, color }) {
       })}
     </svg>
   )
+}
