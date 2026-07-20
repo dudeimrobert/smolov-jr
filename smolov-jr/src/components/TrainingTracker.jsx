@@ -134,7 +134,7 @@ export default function TrainingTracker({ user }) {
           const filtered = curr.filter(h => h.date !== today)
           newHistory = {
             ...newHistory,
-            [exId]: [{ date: today, weight: parseFloat(wt), setsCompleted: total }, ...filtered].slice(0, 20),
+            [exId]: [{ date: today, weight: parseFloat(wt), reps: parseInt(ex.reps, 10) || 5, setsCompleted: total }, ...filtered].slice(0, 20),
           }
         }
       }
@@ -432,7 +432,7 @@ export default function TrainingTracker({ user }) {
   )
 }
 
-// ─── STYLES ───────────────────────────────────────────────────────────────────
+// ─── STYLES ──────────────────────────────────────────────────────────────────
 
 const CSS = `
   input:focus { outline: none; border-color: #6A6A6A !important; }
