@@ -4,6 +4,7 @@ import Auth from './components/Auth'
 import Tracker from './components/Tracker'
 import TrainingTracker from './components/TrainingTracker'
 import ProgressLog from './components/ProgressLog'
+import JailhouseTracker from './components/JailhouseTracker'
 
 const FONT_MONO = "'DM Mono', monospace"
 const FONT_DISPLAY = "'Bebas Neue', sans-serif"
@@ -26,6 +27,12 @@ const SECTIONS = [
     title: 'PROGRESS LOG',
     sub: 'MAIN LIFT NUMBERS OVER TIME',
     accent: '#9BC97F',
+  },
+  {
+    id: 'power',
+    title: 'POWER',
+    sub: 'JAILHOUSE STRONG — 3-DAY BLOCK',
+    accent: '#E8C547',
   },
 ]
 
@@ -205,6 +212,15 @@ export default function App() {
           transition: 'opacity 0.15s ease',
         }}>
           <ProgressLog user={user} />
+        </div>
+        <div style={{
+          opacity: mode === 'power' ? 1 : 0,
+          position: mode === 'power' ? 'relative' : 'absolute',
+          width: '100%',
+          pointerEvents: mode === 'power' ? 'auto' : 'none',
+          transition: 'opacity 0.15s ease',
+        }}>
+          <JailhouseTracker user={user} />
         </div>
       </div>
     </div>
